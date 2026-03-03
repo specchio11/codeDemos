@@ -1,4 +1,4 @@
-// ============================================================
+﻿// ============================================================
 // 模式三：寻人罗盘 — 游戏主逻辑 (fog_app.js)
 // ============================================================
 
@@ -6,8 +6,8 @@
     'use strict';
 
     var state = {
-        ap: 20,
-        apMax: 20,
+        ap: 12,
+        apMax: 12,
         searchCost: 3,
         arrestCost: 0,        // 指认不消耗AP，但猜错罚5AP
         arrestPenalty: 5,     // 猜错惩罚
@@ -15,9 +15,15 @@
         targetNodeId: null,
         clues: [],           // { step, nodeSearched, text }
         nodeStates: {},      // nodeId -> { revealed, markedX }
-        phase: 'play',       // play | gameover
+        phase: 'play',       // play | gameover | roundEnd
         step: 0,
-        wrongGuesses: 0
+        wrongGuesses: 0,
+        // ---- 三局两胜 ----
+        round: 1,
+        maxRounds: 3,
+        winsNeeded: 2,
+        playerWins: 0,
+        petWins: 0
     };
 
     var $root, $clueList, $toast, $popup;
@@ -57,6 +63,9 @@
         state.step = 0;
         state.wrongGuesses = 0;
         state.insight = DB_FOG.HERO.insight;
+        state.round = 1;
+        state.playerWins = 0;
+        state.petWins = 0;
 
         allNodes.forEach(function (n) {
             state.nodeStates[n.id] = { revealed: false, markedX: false };
@@ -81,8 +90,9 @@
         topbar.innerHTML =
             '<span class="topbar-title" id="fog-title">🐾 灵宠踪迷藏</span>' +
             '<div class="topbar-stats">' +
-                '<span id="stat-ap">⚡ 行动力：' + state.ap + '/' + state.apMax + '</span>' +
-                '<span>🔍 洞察：' + state.insight + '</span>' +
+                '<span id="stat-round">第 ' + state.round + '/' + state.maxRounds + ' 轮</span>' +
+                '<span id="stat-score">🧑 ' + state.playerWins + ' : ' + state.petWins + ' 🐾</span>' +
+                '<span id="stat-ap">⚡ ' + state.ap + '/' + state.apMax + '</span>' +
             '</div>' +
             '<div style="display:flex;gap:8px;">' +
                 '<button class="topbar-btn back-btn" onclick="location.href=\'../index.html\'">↩ 返回</button>' +
@@ -106,11 +116,11 @@
         sidebar.innerHTML =
             '<div class="action-hint">' +
                 '💡 <strong>操作提示</strong><br>' +
-                '· 你的灵宠蹲在庞院某处，快找到它！<br>' +
+                '· 三局两胜！灵宠藏在庭院某处，找到它！<br>' +
                 '· 点击节点「探索」获取线索（-3AP）<br>' +
                 '· 觉得找到了？「找到了！」免费指认，但猜错罚5AP<br>' +
                 '· 右键可标记 ✕ 辅助排除<br>' +
-                '· 行动力耗尽则游戏失败' +
+                '· AP 耗尽 = 该轮灵宠赢，先赢 2 轮者胜' +
             '</div>' +
             '<div class="clue-title">📋 线索进度板</div>' +
             '<div class="clue-list" id="clue-list"></div>';
@@ -332,20 +342,27 @@
     function doArrest(nodeId) {
         // 指认不消耗AP
         if (nodeId === state.targetNodeId) {
-            // 胜利！
-            state.phase = 'gameover';
-            var nd = nodeIndex[nodeId];
+            // 本轮玩家赢
+            state.playerWins += 1;
             var ndEl = document.getElementById('node-' + nodeId);
             if (ndEl) ndEl.classList.add('target-found');
             state.nodeStates[nodeId].revealed = true;
             refreshNodeUI(nodeId);
             updateUI();
-            showResult(true);
+            showToast('🎉 找到了！在「' + nodeIndex[nodeId].name + '」逮到小家伙啦！');
+            // 检查是否已经胜利
+            if (state.playerWins >= state.winsNeeded) {
+                state.phase = 'gameover';
+                showResult(true);
+            } else {
+                state.phase = 'roundEnd';
+                showRoundResult(true);
+            }
         } else {
             // 错误：罚 AP
             state.wrongGuesses += 1;
             state.ap = Math.max(0, state.ap - state.arrestPenalty);
-            showToast('❌ 不对呢！「' + nodeIndex[nodeId].name + '」里没有小家伙的踪影，被它打发走啦！(-' + state.arrestPenalty + 'AP)');
+            showToast('❌ 不对呢！「' + nodeIndex[nodeId].name + '」里没有小家伙，被它打发走啦！(-' + state.arrestPenalty + 'AP)');
             state.nodeStates[nodeId].revealed = true;
             // 生成一条线索作为补偿
             var clueText = generateClue(nodeId);
@@ -450,17 +467,71 @@
     // ======== 检查 AP 耗尽 ========
     function checkAPDeath() {
         if (state.ap <= 0 && state.phase === 'play') {
-            state.phase = 'gameover';
-            showResult(false);
+            // 本轮灵宠赢
+            state.petWins += 1;
+            if (state.petWins >= state.winsNeeded) {
+                state.phase = 'gameover';
+                showResult(false);
+            } else {
+                state.phase = 'roundEnd';
+                showRoundResult(false);
+            }
         }
     }
 
-    // ======== 结算 ========
+    // ======== 轮次结算弹窗 ========
+    function showRoundResult(playerWon) {
+        var overlay = el('div', { className: 'result-overlay round-overlay' });
+        var box = el('div', { className: 'result-box' });
+        var msg = playerWon
+            ? '🎉 第 ' + state.round + ' 轮 — 你赢了！在「' + nodeIndex[state.targetNodeId].name + '」逮到了小家伙。'
+            : '🐾 第 ' + state.round + ' 轮 — 灵宠赢！它藏在「' + nodeIndex[state.targetNodeId].name + '」，你没能找到。';
+        box.innerHTML =
+            '<h2>' + (playerWon ? '✅ 你赢了这轮' : '😼 灵宠赢了这轮') + '</h2>' +
+            '<p>' + msg + '</p>' +
+            '<p style="font-size:1.2rem;">🧑 ' + state.playerWins + ' : ' + state.petWins + ' 🐾</p>' +
+            '<p style="color:#8b949e;">剩余 AP 将带入下一轮</p>' +
+            '<button class="topbar-btn" id="btn-next-round">下一轮 ▶</button>';
+        overlay.appendChild(box);
+        $root.appendChild(overlay);
+        document.getElementById('btn-next-round').addEventListener('click', function () {
+            overlay.remove();
+            startNextRound();
+        });
+    }
+
+    // ======== 开始下一轮 ========
+    function startNextRound() {
+        state.round += 1;
+        state.phase = 'play';
+        state.step = 0;
+        state.clues = [];
+        state.ap = Math.min(state.apMax, state.ap + state.apMax); // 回满 AP
+
+        // 重置迷雾
+        allNodes.forEach(function (n) {
+            state.nodeStates[n.id] = { revealed: false, markedX: false };
+        });
+
+        // 重新选目标（避免和上轮一样）
+        var oldTarget = state.targetNodeId;
+        var tries = 0;
+        do {
+            var idx = Math.floor(Math.random() * allNodes.length);
+            state.targetNodeId = allNodes[idx].id;
+            tries++;
+        } while (state.targetNodeId === oldTarget && tries < 20);
+        console.log('[DEBUG] 第' + state.round + '轮 灵宠藏在：' + state.targetNodeId + ' (' + nodeIndex[state.targetNodeId].name + ')');
+
+        render();
+    }
+
+    // ======== 最终结算 ========
     function showResult(isWin) {
         var starsCount = 0;
         if (isWin) {
-            if (state.wrongGuesses === 0 && state.ap >= 10) starsCount = 3;
-            else if (state.wrongGuesses <= 1 && state.ap >= 5) starsCount = 2;
+            if (state.petWins === 0 && state.wrongGuesses === 0) starsCount = 3;
+            else if (state.petWins === 0) starsCount = 2;
             else starsCount = 1;
         }
         var starsStr = '';
@@ -471,19 +542,18 @@
         var box = el('div', { className: 'result-box' });
 
         if (isWin) {
-            var targetName = nodeIndex[state.targetNodeId].name;
             box.innerHTML =
-                '<h2>🎉 找到了！</h2>' +
-                '<p>你在「' + targetName + '」找到了蹲在角落里的小家伙，它不情不愿地被你抽了出来。</p>' +
+                '<h2>🎉 你赢了！</h2>' +
+                '<p>经过 ' + state.round + ' 轮角逐，你以 ' + state.playerWins + ':' + state.petWins + ' 赢得了躲猫猫大赛！小家伙不服气地蹭了蹭你的靴子。</p>' +
                 '<div class="stars">' + starsStr + '</div>' +
-                '<p style="font-size:.85rem;color:#8b949e;">剩余行动力：' + state.ap + '/' + state.apMax + '<br>找错次数：' + state.wrongGuesses + ' 次</p>' +
+                '<p style="font-size:.85rem;color:#8b949e;">总找错次数：' + state.wrongGuesses + ' 次</p>' +
                 '<button class="topbar-btn" onclick="FogApp.restart()">再来一局</button>' +
                 ' <button class="topbar-btn back-btn" onclick="location.href=\'../index.html\'">返回菜单</button>';
         } else {
             box.innerHTML =
-                '<h2 style="color:#f85149;">� 没找到……</h2>' +
-                '<p>天色已晚，行动力耗尽，小家伙却还藏得好好的……</p>' +
-                '<p style="font-size:.85rem;color:#8b949e;">它藏在：' + nodeIndex[state.targetNodeId].name + '</p>' +
+                '<h2 style="color:#f85149;">😼 灵宠赢了！</h2>' +
+                '<p>比分 ' + state.playerWins + ':' + state.petWins + '，小家伙得意地从藏身处溜出来，冲你摇了摇尾巴。</p>' +
+                '<p style="font-size:.85rem;color:#8b949e;">它最后藏在：' + nodeIndex[state.targetNodeId].name + '</p>' +
                 '<button class="topbar-btn" onclick="FogApp.restart()">再来一局</button>' +
                 ' <button class="topbar-btn back-btn" onclick="location.href=\'../index.html\'">返回菜单</button>';
         }
@@ -495,7 +565,11 @@
     // ======== UI 辅助 ========
     function updateUI() {
         var apEl = document.getElementById('stat-ap');
-        if (apEl) apEl.textContent = '⚡ 行动力：' + state.ap + '/' + state.apMax;
+        if (apEl) apEl.textContent = '⚡ ' + state.ap + '/' + state.apMax;
+        var roundEl = document.getElementById('stat-round');
+        if (roundEl) roundEl.textContent = '第 ' + state.round + '/' + state.maxRounds + ' 轮';
+        var scoreEl = document.getElementById('stat-score');
+        if (scoreEl) scoreEl.textContent = '🧑 ' + state.playerWins + ' : ' + state.petWins + ' 🐾';
     }
 
     function refreshNodeUI(nodeId) {
