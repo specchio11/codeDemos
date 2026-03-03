@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NPC生成系统 · 修仙大富翁Demo</title>
+    <link rel="stylesheet" href="/styles/common.css">
+    <link rel="stylesheet" href="/storyline/npc_demo/npc_style.css">
+</head>
+<body>
+
+    <!-- ═══ 顶栏 ═══ -->
+    <header class="npc-header">
+        <a href="/index.html" class="npc-back">← 返回首页</a>
+        <h1>NPC 生成系统 Demo</h1>
+        <span class="npc-counter" id="npc-counter">0 / 30</span>
+    </header>
+
+    <!-- ═══ 操作面板 ═══ -->
+    <section class="npc-controls">
+        <div class="npc-controls__left">
+            <button class="btn btn-primary" id="btn-gen-1" onclick="NPC_APP.generate(1)">生成 1 个 NPC</button>
+            <button class="btn btn-secondary" id="btn-gen-5" onclick="NPC_APP.generate(5)">批量生成 5 个</button>
+            <button class="btn btn-danger" onclick="NPC_APP.clearAll()">清空所有</button>
+            <button class="btn btn-sim" onclick="NPC_APP.simulate(100)">📊 模拟100次</button>
+        </div>
+        <div class="npc-controls__right">
+            <label class="control-label">诱饵类型:</label>
+            <select id="lure-type" class="select-lure">
+                <option value="general">泛用·灵茶</option>
+                <option value="sword">垂类·剑谱</option>
+                <option value="alchemy">垂类·丹方</option>
+            </select>
+            <span class="lure-desc" id="lure-desc">不偏不倚，来者皆可</span>
+        </div>
+    </section>
+
+    <!-- ═══ 主内容区 ═══ -->
+    <div class="npc-main" id="npc-main">
+        <!-- 左侧: NPC列表 -->
+        <section class="npc-list-panel" id="npc-list-panel">
+            <h2 class="panel-title">散修名录 <small>（点击查看详情）</small></h2>
+            <div class="npc-list" id="npc-list">
+                <div class="npc-list-empty">尚无散修来访，请使用诱饵招募</div>
+            </div>
+        </section>
+
+        <!-- 左右拖拽分割线 -->
+        <div class="splitter splitter-v" id="splitter-v"></div>
+
+        <!-- 右侧: 详情面板 -->
+        <section class="npc-detail-panel" id="npc-detail">
+            <div class="npc-detail-empty">
+                <span class="empty-icon">🎭</span>
+                <p>选择一位散修查看详情</p>
+            </div>
+        </section>
+    </div>
+
+    <!-- 上下拖拽分割线 -->
+    <div class="splitter splitter-h" id="splitter-h"></div>
+
+    <!-- ═══ Debug & Log 面板 ═══ -->
+    <div class="npc-bottom" id="npc-bottom">
+        <section class="npc-debug-panel">
+            <h2 class="panel-title collapsible" onclick="NPC_APP.togglePanel('debug')">
+                📋 Debug 数据 <span id="debug-toggle">▼</span>
+            </h2>
+            <pre class="npc-debug-content" id="npc-debug">选择NPC后显示完整数据结构</pre>
+        </section>
+
+        <section class="npc-log-panel">
+            <h2 class="panel-title collapsible" onclick="NPC_APP.togglePanel('log')">
+                📜 生成日志 <span id="log-toggle">▼</span>
+            </h2>
+            <div class="npc-log" id="npc-log">
+                <div class="log-entry log-info">系统就绪，等待诱饵投放...</div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ═══ 脚本加载顺序: 平台模拟 → 函数文件夹 → UI文件夹 → 剧情文件夹 ═══ -->
+
+    <!-- 全局错误捕获 (debug用) -->
+    <script>
+    window.onerror = function(msg, url, line, col, err) {
+        var logEl = document.getElementById('npc-log');
+        if (logEl) {
+            var entry = document.createElement('div');
+            entry.className = 'log-entry log-warn';
+            entry.textContent = '[JS ERROR] ' + msg + ' (' + url + ':' + line + ')';
+            logEl.insertBefore(entry, logEl.firstChild);
+        }
+        console.error('[CAUGHT]', msg, url, line, col, err);
+    };
+    </script>
+
+    <!-- 拖拽分割线逻辑 -->
+    <script>
+    (function () {
+        // --- 左右分割线 (splitter-v) ---
+        var sv = document.getElementById('splitter-v');
+        var listPanel = document.getElementById('npc-list-panel');
+        var mainArea = document.getElementById('npc-main');
+        var MIN_LIST_W = 180;
+        var MAX_LIST_RATIO = 0.5; // 列表最大占主区50%
+
+        sv.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            sv.classList.add('active');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+
+            var startX = e.clientX;
+            var startW = listPanel.offsetWidth;
+
+            function onMove(e2) {
+                var dx = e2.clientX - startX;
+                var newW = startW + dx;
+                var maxW = mainArea.offsetWidth * MAX_LIST_RATIO;
+                if (newW < MIN_LIST_W) newW = MIN_LIST_W;
+                if (newW > maxW) newW = maxW;
+                listPanel.style.width = newW + 'px';
+            }
+            function onUp() {
+                sv.classList.remove('active');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+            }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        });
+
+        // --- 上下分割线 (splitter-h) ---
+        var sh = document.getElementById('splitter-h');
+        var bottomPanel = document.getElementById('npc-bottom');
+        var MIN_MAIN_H = 200;
+        var MIN_BOTTOM_H = 100;
+
+        sh.addEventListener('mousedown', function (e) {
+            e.preventDefault();
+            sh.classList.add('active');
+            document.body.style.cursor = 'row-resize';
+            document.body.style.userSelect = 'none';
+
+            var startY = e.clientY;
+            var startMainH = mainArea.offsetHeight;
+            var startBottomH = bottomPanel.offsetHeight;
+
+            function onMove(e2) {
+                var dy = e2.clientY - startY;
+                var newMainH = startMainH + dy;
+                var newBottomH = startBottomH - dy;
+                if (newMainH < MIN_MAIN_H) { newMainH = MIN_MAIN_H; newBottomH = startMainH + startBottomH - MIN_MAIN_H; }
+                if (newBottomH < MIN_BOTTOM_H) { newBottomH = MIN_BOTTOM_H; newMainH = startMainH + startBottomH - MIN_BOTTOM_H; }
+                mainArea.style.minHeight = newMainH + 'px';
+                mainArea.style.maxHeight = newMainH + 'px';
+                mainArea.style.height = newMainH + 'px';
+                // 同步左右子面板的maxHeight
+                listPanel.style.maxHeight = newMainH + 'px';
+                var detailPanel = document.getElementById('npc-detail');
+                if (detailPanel) detailPanel.style.maxHeight = newMainH + 'px';
+                // 同步底部面板高度
+                bottomPanel.style.height = newBottomH + 'px';
+            }
+            function onUp() {
+                sh.classList.remove('active');
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+                document.removeEventListener('mousemove', onMove);
+                document.removeEventListener('mouseup', onUp);
+            }
+            document.addEventListener('mousemove', onMove);
+            document.addEventListener('mouseup', onUp);
+        });
+    })();
+    </script>
+
+    <!-- 平台模拟层 -->
+    <script src="/platform/yiciyuan_sim.js"></script>
+
+    <!-- 函数文件夹 (全局加载，模拟易次元每次切换时重执行) -->
+    <script src="/functions/shared/UTIL_random.js"></script>
+    <script src="/functions/npc/DB_npc.js"></script>
+    <script src="/functions/npc/DB_portraits.js"></script>
+    <script src="/functions/npc/MG_npc_generator.js"></script>
+
+    <!-- UI文件夹 (蒙层/弹窗组件) -->
+    <script src="/ui/shared/UI_modal.js"></script>
+
+    <!-- 剧情文件夹 (当前页面入口逻辑) -->
+    <script src="/storyline/npc_demo/npc_app.js"></script>
+
+</body>
+</html>

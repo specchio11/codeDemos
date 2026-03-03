@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>庭院探案 — 万宝阁悬案卷宗</title>
+    <link rel="stylesheet" href="styles/common.css">
+    <link rel="stylesheet" href="styles/detective.css">
+    <style>
+        /* 加载指示 */
+        #loading-screen {
+            position: fixed; inset:0;
+            background: #0d1117;
+            display: flex; align-items:center; justify-content:center;
+            flex-direction: column; gap:12px;
+            z-index: 9999;
+            transition: opacity .4s;
+        }
+        #loading-screen.hide { opacity:0; pointer-events:none; }
+        #loading-screen .spinner {
+            width:36px; height:36px;
+            border: 3px solid #30363d;
+            border-top-color: #c9a96e;
+            border-radius: 50%;
+            animation: spin .8s linear infinite;
+        }
+        @keyframes spin { to { transform:rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <!-- 加载画面 -->
+    <div id="loading-screen">
+        <div class="spinner"></div>
+        <span style="color:#8b949e;font-size:.85rem;">正在载入庭院探案…</span>
+    </div>
+
+    <!-- 游戏主容器 -->
+    <div id="game-main"></div>
+
+    <!-- ═══ 脚本加载 (顺序严格) ═══ -->
+    <!-- 1. 平台模拟层 (创建 ac 全局对象) -->
+    <script src="platform/yiciyuan_sim.js"></script>
+
+    <!-- 2. 常量数据 (地点/嫌疑人/线索/模板/对话/干扰/技能) -->
+    <script src="functions/DB_cases.js"></script>
+
+    <!-- 3. 引擎逻辑 (案件生成/检定/判定) -->
+    <script src="functions/ENG_detective.js"></script>
+
+    <!-- 4. 主应用 (UI/交互/游戏主循环) -->
+    <script src="storyline/detective_app.js"></script>
+
+    <script>
+        // 隐藏加载画面
+        window.addEventListener('DOMContentLoaded', function() {
+            setTimeout(function() {
+                var ls = document.getElementById('loading-screen');
+                if (ls) { ls.classList.add('hide'); setTimeout(function(){ ls.remove(); }, 500); }
+            }, 300);
+        });
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>云津小馆 - 餐厅经营策略游戏</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- ===== 统计栏 ===== -->
+    <div id="stats-bar" class="hidden">
+      <span id="stat-day">Day 1</span>
+      <span id="stat-tick"></span>
+      <span id="stat-cash">💰 1600</span>
+      <span id="stat-rep">⭐ 40</span>
+      <span id="stat-hyg">🧹 70</span>
+    </div>
+
+    <!-- ===== 标题屏 ===== -->
+    <div id="screen-title" class="screen">
+      <div class="title-content">
+        <h1>云津小馆</h1>
+        <p class="title-sub">排队调度 · 备制策略 · 风险管理</p>
+        <p class="title-desc">
+          在 7 天的经营中，每天面对 12 轮高峰 Tick<br>
+          管理客人队列、选择菜单、备制半成品、应对突发事件<br>
+          最终达成 现金≥3000 · 口碑≥60 · 卫生≥50 即为通关
+        </p>
+        <div class="title-mode-buttons">
+          <button class="btn-mode btn-mode-normal" onclick="startNewGame('normal')">
+            <span class="btn-mode-icon">🍜</span>
+            <span class="btn-mode-name">常规模式</span>
+            <span class="btn-mode-desc">客人自己点菜，你负责出餐</span>
+          </button>
+          <button class="btn-mode btn-mode-omakase" onclick="startNewGame('omakase')">
+            <span class="btn-mode-icon">🍣</span>
+            <span class="btn-mode-name">Omakase 模式</span>
+            <span class="btn-mode-desc">客人不点菜，由你决定上什么</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== 筹划屏 ===== -->
+    <div id="screen-planning" class="screen hidden">
+      <div id="planning-content">
+        <!-- 由 renderPlanning() 动态填充 -->
+      </div>
+    </div>
+
+    <!-- ===== 高峰屏 ===== -->
+    <div id="screen-rush" class="screen hidden">
+      <div class="rush-layout">
+        <div id="log-panel">
+          <div class="log-title">📜 日志</div>
+        </div>
+        <div id="queue-panel">
+          <div class="queue-empty">暂无客人在排队</div>
+        </div>
+        <div id="side-panel"></div>
+      </div>
+      <div id="action-panel"></div>
+    </div>
+
+    <!-- ===== 打烊屏 ===== -->
+    <div id="screen-dayend" class="screen hidden">
+      <div id="dayend-content">
+        <!-- 由 renderDayEnd() 动态填充 -->
+      </div>
+    </div>
+
+    <!-- ===== 游戏结束屏 ===== -->
+    <div id="screen-gameover" class="screen hidden">
+      <div id="gameover-content">
+        <!-- 由 renderGameOver() 动态填充 -->
+      </div>
+    </div>
+
+  </div>
+
+  <script src="data.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,78 @@
+/* ============================================================
+   庭院小游戏 — 共用样式
+   ============================================================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 20px; }
+* { min-font-size: 20px; }
+body {
+    font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+    background: #0d1117; color: #e6d5b8;
+    min-height: 100vh; overflow-x: hidden;
+}
+button { cursor: pointer; font-family: inherit; }
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: #161b22; }
+::-webkit-scrollbar-thumb { background: #30363d; border-radius: 3px; }
+
+/* ---- 主菜单 ---- */
+.menu-wrapper {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; gap: 30px;
+}
+.menu-title { font-size: 2rem; color: #c9a96e; text-shadow: 0 0 20px rgba(201,169,110,.4); }
+.menu-subtitle { font-size: 1.1rem; color: #8b949e; margin-top: -20px; }
+.menu-btn {
+    width: 340px; padding: 18px 0; font-size: 1.15rem;
+    border: 2px solid #c9a96e; background: rgba(201,169,110,.08);
+    color: #c9a96e; border-radius: 8px;
+    transition: all .25s;
+}
+.menu-btn:hover { background: rgba(201,169,110,.22); transform: scale(1.04); }
+
+/* ---- 通用顶栏 ---- */
+.topbar {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 20px; background: rgba(13,17,23,.92);
+    border-bottom: 1px solid #30363d; position: sticky; top: 0; z-index: 100;
+}
+.topbar-title { font-size: 1.1rem; color: #c9a96e; }
+.topbar-stats { display: flex; gap: 20px; font-size: 1rem; color: #8b949e; }
+.topbar-stats span { display: flex; align-items: center; gap: 4px; }
+.topbar-btn {
+    padding: 8px 20px; border: 1px solid #c9a96e; background: rgba(201,169,110,.12);
+    color: #c9a96e; border-radius: 6px; font-size: 1rem; transition: all .2s;
+}
+.topbar-btn:hover { background: rgba(201,169,110,.3); }
+.topbar-btn:disabled { opacity: .4; cursor: not-allowed; }
+.topbar-btn.back-btn { border-color: #8b949e; color: #8b949e; background: rgba(139,148,158,.1); }
+.topbar-btn.back-btn:hover { background: rgba(139,148,158,.25); }
+
+/* ---- 地图容器 ---- */
+.map-container {
+    position: relative; width: 100%; max-width: 1200px;
+    margin: 0 auto; user-select: none;
+}
+.map-container img { width: 100%; display: block; border-radius: 6px; }
+
+/* ---- 结算蒙版 ---- */
+.result-overlay {
+    position: fixed; inset: 0; z-index: 500;
+    background: rgba(0,0,0,.75); display: flex; align-items: center; justify-content: center;
+}
+.result-box {
+    background: #161b22; border: 2px solid #c9a96e; border-radius: 12px;
+    padding: 40px 50px; text-align: center; max-width: 500px;
+}
+.result-box h2 { color: #c9a96e; font-size: 1.6rem; margin-bottom: 14px; }
+.result-box p  { color: #e6d5b8; font-size: 1rem; line-height: 1.7; margin-bottom: 10px; }
+.result-box .stars { font-size: 2rem; margin: 10px 0; }
+.result-box button { margin-top: 16px; }
+
+/* ---- 帮助/提示弹窗 ---- */
+.toast {
+    position: fixed; top: 70px; left: 50%; transform: translateX(-50%);
+    padding: 10px 28px; background: #2d333b; color: #e6d5b8;
+    border: 1px solid #c9a96e; border-radius: 8px; font-size: 1rem;
+    z-index: 600; opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+.toast.show { opacity: 1; }

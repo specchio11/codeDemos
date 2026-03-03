@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>修仙大富翁 · 系统Demo</title>
+    <link rel="stylesheet" href="styles/common.css">
+</head>
+<body>
+    <div class="home-container">
+        <header class="home-header">
+            <h1>修仙大富翁 · 系统Demo</h1>
+            <p class="home-subtitle">局外养成 × 局内对战 — 子系统原型验证</p>
+            <p class="home-platform-info">易次元代码流模拟环境 · 三文件夹架构 (函数 / 剧情 / UI)</p>
+        </header>
+
+        <div class="home-grid" id="demo-grid">
+            <!-- 由 storyline/home/home.js 动态填充 -->
+        </div>
+
+        <footer class="home-footer">
+            <div class="home-arch-info">
+                <span class="arch-tag">functions/</span> 全局常量 & 纯函数
+                <span class="arch-sep">·</span>
+                <span class="arch-tag">storyline/</span> 页面入口 & 逻辑
+                <span class="arch-sep">·</span>
+                <span class="arch-tag">ui/</span> 蒙层 & 弹窗组件
+            </div>
+        </footer>
+    </div>
+
+    <!-- 平台模拟层 -->
+    <script src="platform/yiciyuan_sim.js"></script>
+    <!-- 剧情文件夹: 首页入口 -->
+    <script src="storyline/home/home.js"></script>
+</body>
+</html>

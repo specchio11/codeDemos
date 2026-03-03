@@ -1,0 +1,126 @@
+/* ============================================================
+   模式三：寻人罗盘 — 样式 (重构版)
+   布局：撑满视口高度，左=地图，右=操作提示+线索日志(scroll)
+   ============================================================ */
+
+.fog-game { display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+
+.fog-body { display: flex; flex: 1; overflow: hidden; }
+
+/* ---- 左侧：地图 ---- */
+.fog-map-area {
+    flex: 1; position: relative; overflow: hidden;
+    display: flex; align-items: flex-start; justify-content: center;
+    padding: 10px; min-width: 0;
+}
+.fog-map-area .map-container {
+    position: relative;
+}
+.fog-map-area .map-container img {
+    width: 100%; height: 100%; display: block;
+    border-radius: 6px;
+}
+
+/* ---- 节点按钮（矩形） ---- */
+.fog-node {
+    position: absolute;
+    padding: 6px 12px;
+    border-radius: 8px; border: 2px solid rgba(201,169,110,.4);
+    background: rgba(30,30,40,.75);
+    cursor: pointer; transition: all .25s;
+    display: flex; align-items: center; justify-content: center;
+    gap: 4px;
+    backdrop-filter: blur(4px);
+    white-space: nowrap;
+}
+.fog-node:hover { border-color: #c9a96e; transform: translate(-50%,-50%) scale(1.06); background: rgba(30,30,40,.9); }
+.fog-node .node-icon { font-size: 1.1rem; flex-shrink: 0; }
+.fog-node .node-name {
+    font-size: 0.9rem; color: #c9a96e; white-space: nowrap;
+    text-shadow: 0 1px 3px #000;
+}
+
+/* 节点连线 */
+.edge-svg { position: absolute; left: 0; top: 0; pointer-events: none; }
+.edge-line {
+    stroke: #000; stroke-width: 3;
+    stroke-dasharray: 6 4;
+}
+
+/* 迷雾状态 */
+.fog-node.fogged { background: rgba(30,30,40,.92); border-color: rgba(140,140,160,.45); }
+.fog-node.fogged .node-icon { filter: grayscale(.6) brightness(.8); }
+.fog-node.fogged .node-name { color: #9e9eb0; }
+
+/* 已揭开 */
+.fog-node.revealed { border-color: #3fb950; background: rgba(63,185,80,.1); }
+.fog-node.revealed .node-icon { filter: none; }
+
+/* 玩家标记的 X */
+.fog-node.marked-x::after {
+    content: '✕'; position: absolute; font-size: 2rem; color: #f85149;
+    font-weight: bold; text-shadow: 0 0 8px rgba(248,81,73,.4);
+    pointer-events: none;
+}
+
+/* 目标高亮 */
+.fog-node.target-found {
+    border-color: #ffd700; background: rgba(255,215,0,.15);
+    box-shadow: 0 0 20px rgba(255,215,0,.4); animation: target-glow 1s infinite;
+}
+@keyframes target-glow { 0%,100%{ box-shadow: 0 0 12px rgba(255,215,0,.3); } 50%{ box-shadow: 0 0 28px rgba(255,215,0,.6); } }
+
+/* ---- 右侧面板：操作提示(顶) + 线索日志(底,scroll) ---- */
+.fog-sidebar {
+    width: 420px; min-width: 420px; background: #161b22;
+    border-left: 1px solid #30363d;
+    display: flex; flex-direction: column; overflow: hidden;
+}
+
+/* 操作提示区 — 固定在右侧顶部 */
+.fog-sidebar .action-hint {
+    padding: 14px 16px; flex-shrink: 0;
+    font-size: 1rem; color: #8b949e; line-height: 1.6;
+    background: #0d1117;
+    border-bottom: 1px solid #30363d;
+}
+.fog-sidebar .action-hint strong { color: #c9a96e; }
+
+/* 线索标题 */
+.clue-title {
+    padding: 10px 16px; font-size: .95rem; color: #c9a96e;
+    border-bottom: 1px solid #30363d; background: #0d1117;
+    flex-shrink: 0;
+}
+
+/* 线索日志 — 可滚动 */
+.clue-list {
+    flex: 1; overflow-y: auto; padding: 10px 16px;
+}
+.clue-entry {
+    padding: 8px 10px; margin-bottom: 6px; background: #0d1117;
+    border: 1px solid #21262d; border-radius: 6px;
+    font-size: 1rem; line-height: 1.5; color: #e6d5b8;
+}
+.clue-entry .clue-step { color: #c9a96e; font-weight: bold; }
+.clue-entry .clue-text { color: #e6d5b8; }
+
+/* ---- 节点操作弹窗 ---- */
+.node-popup {
+    position: fixed; z-index: 300;
+    background: #161b22; border: 2px solid #c9a96e; border-radius: 10px;
+    padding: 16px 20px; min-width: 360px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.5);
+}
+.node-popup h3 { color: #c9a96e; font-size: .9rem; margin-bottom: 10px; }
+.node-popup .popup-btns { display: flex; gap: 10px; flex-wrap: nowrap; }
+.node-popup .popup-btn {
+    flex: 1; padding: 10px 14px; border: 1px solid #30363d; background: #0d1117;
+    color: #e6d5b8; border-radius: 6px; font-size: 1rem; cursor: pointer;
+    transition: all .2s; text-align: center; white-space: nowrap;
+}
+.node-popup .popup-btn:hover { border-color: #c9a96e; background: rgba(201,169,110,.1); }
+.node-popup .popup-btn.danger { border-color: #f85149; color: #f85149; }
+.node-popup .popup-btn.danger:hover { background: rgba(248,81,73,.1); }
+.node-popup .popup-btn.mark { border-color: #8b949e; color: #8b949e; }
+.node-popup .popup-btn.mark:hover { background: rgba(139,148,158,.1); }

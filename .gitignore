@@ -1,0 +1,5 @@
+# Ignore everything except CodeDemo
+*
+!CodeDemo/
+!CodeDemo/**
+!.gitignore
