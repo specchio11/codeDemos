@@ -1,0 +1,137 @@
+/* ---- 舌战客栈 — 专属样式 ---- */
+
+/* 路线条 */
+.route-bar {
+    display: flex; gap: 4px; padding: 10px 14px; background: rgba(22,27,34,.9);
+    border-bottom: 1px solid #30363d; flex-shrink: 0; overflow-x: auto;
+}
+.route-node {
+    flex: 1; min-width: 70px; text-align: center; padding: 6px 4px;
+    border: 1px solid #30363d; border-radius: 6px; font-size: .8rem;
+    color: #8b949e; background: rgba(33,38,45,.6); transition: all .3s;
+}
+.route-node.current { border-color: #c9a96e; color: #c9a96e; background: rgba(201,169,110,.15); }
+.route-node.done { border-color: #56d364; color: #56d364; background: rgba(86,211,100,.08); }
+.route-node .node-icon { font-size: 1.1rem; display: block; margin-bottom: 2px; }
+
+/* 战场 */
+.battle-field {
+    flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 14px;
+}
+.opponent-area {
+    display: flex; align-items: center; gap: 16px; padding: 16px;
+    border: 1px solid #30363d; border-radius: 8px; background: rgba(33,38,45,.7);
+    margin-bottom: 12px;
+}
+.opponent-area .portrait-img {
+    width: 80px; height: 80px; border-radius: 50%; object-fit: cover;
+    border: 2px solid #f85149; flex-shrink: 0;
+}
+.opponent-area .portrait-emoji {
+    width: 80px; height: 80px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2.5rem; background: rgba(22,27,34,.8); border: 2px solid #f85149;
+    flex-shrink: 0;
+}
+.opponent-area .info { flex: 1; display: flex; flex-direction: column; gap: 6px; }
+.opponent-area .name-row { display: flex; align-items: center; gap: 10px; }
+.opponent-area .cname { font-size: 1.1rem; color: #e6d5b8; }
+.opponent-area .intent {
+    font-size: .85rem; padding: 3px 10px; border-radius: 4px;
+    background: rgba(248,81,73,.15); color: #f85149; border: 1px solid rgba(248,81,73,.3);
+}
+.opponent-area .buffs { display: flex; gap: 6px; flex-wrap: wrap; }
+.buff-tag {
+    font-size: .8rem; padding: 2px 8px; border-radius: 4px;
+    background: rgba(88,166,255,.15); color: #58a6ff; border: 1px solid rgba(88,166,255,.25);
+}
+.buff-tag.debuff {
+    background: rgba(248,81,73,.12); color: #f85149; border-color: rgba(248,81,73,.25);
+}
+
+/* 手牌区 */
+.hand-area {
+    padding: 12px 14px; border-top: 1px solid #30363d;
+    background: rgba(22,27,34,.95); flex-shrink: 0;
+}
+.hand-area h4 { color: #c9a96e; font-size: 1rem; margin-bottom: 8px; }
+.hand-row {
+    display: flex; gap: 8px; flex-wrap: wrap;
+}
+.card {
+    width: 130px; padding: 10px; border: 2px solid #30363d; border-radius: 8px;
+    background: rgba(33,38,45,.9); cursor: pointer; transition: all .2s;
+    display: flex; flex-direction: column; gap: 4px;
+}
+.card:hover { border-color: #c9a96e; transform: translateY(-4px); }
+.card.unplayable { opacity: .5; border-color: #f85149; cursor: not-allowed; }
+.card .card-top { display: flex; justify-content: space-between; align-items: center; }
+.card .card-cost {
+    width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; font-size: .85rem; font-weight: bold;
+    background: rgba(88,166,255,.2); color: #58a6ff; border: 1px solid rgba(88,166,255,.3);
+}
+.card .card-cost.attack { background: rgba(248,81,73,.15); color: #f85149; border-color: rgba(248,81,73,.3); }
+.card .card-cost.skill { background: rgba(201,169,110,.15); color: #c9a96e; border-color: rgba(201,169,110,.3); }
+.card .card-cost.power { background: rgba(188,140,255,.15); color: #bc8cff; border-color: rgba(188,140,255,.3); }
+.card .card-cost.curse { background: rgba(139,148,158,.15); color: #8b949e; border-color: rgba(139,148,158,.3); }
+.card .card-icon { font-size: 1.3rem; }
+.card .card-name { font-size: .9rem; color: #e6d5b8; font-weight: bold; }
+.card .card-type { font-size: .75rem; color: #8b949e; }
+.card .card-desc { font-size: .8rem; color: #8b949e; line-height: 1.4; }
+
+/* AP / 状态条 */
+.status-bar {
+    display: flex; gap: 20px; padding: 10px 14px;
+    border-top: 1px solid #30363d; background: rgba(22,27,34,.92); flex-shrink: 0;
+    align-items: center;
+}
+.ap-display {
+    display: flex; gap: 4px; align-items: center;
+}
+.ap-pip {
+    width: 28px; height: 28px; border-radius: 50%; border: 2px solid #58a6ff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .85rem; color: #58a6ff;
+}
+.ap-pip.filled { background: rgba(88,166,255,.3); }
+.ap-pip.empty { opacity: .3; }
+.deck-info { font-size: .9rem; color: #8b949e; display: flex; gap: 16px; }
+
+/* 行动 */
+.action-row {
+    display: flex; gap: 10px; padding: 10px 14px;
+    border-top: 1px solid #30363d; background: rgba(22,27,34,.95); flex-shrink: 0;
+}
+
+/* 非战斗 */
+.node-screen {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; padding: 30px; gap: 20px; text-align: center;
+}
+.node-screen h2 { color: #c9a96e; font-size: 1.4rem; }
+.node-screen p { color: #e6d5b8; font-size: 1rem; line-height: 1.7; max-width: 500px; }
+
+/* 遗物 */
+.relics-bar {
+    display: flex; gap: 6px; flex-wrap: wrap; padding: 6px 14px;
+    border-top: 1px solid #30363d; background: rgba(22,27,34,.9); flex-shrink: 0;
+}
+.relic-icon {
+    font-size: 1.2rem; padding: 3px 6px; border: 1px solid #30363d;
+    border-radius: 4px; background: rgba(33,38,45,.7);
+    cursor: default; position: relative;
+}
+.relic-icon:hover::after {
+    content: attr(data-tip); position: absolute; bottom: 110%; left: 50%;
+    transform: translateX(-50%); white-space: nowrap;
+    padding: 4px 10px; background: #2d333b; color: #e6d5b8;
+    border: 1px solid #c9a96e; border-radius: 4px; font-size: .8rem; z-index: 50;
+}
+
+/* powers display */
+.powers-display { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.power-tag {
+    font-size: .8rem; padding: 2px 8px; border-radius: 4px;
+    background: rgba(188,140,255,.12); color: #bc8cff; border: 1px solid rgba(188,140,255,.25);
+}

@@ -1,0 +1,285 @@
+/* ============================================================
+   气运钱庄 — 专属样式 (fortune.css)
+   ============================================================ */
+
+/* ---- 布局 ---- */
+.stage-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    font-size: 20px;
+    background: #2a1f14;
+    border-bottom: 2px solid #c9a94e;
+}
+.stage-bar .stage-label {
+    font-weight: bold;
+    color: #ffe082;
+    min-width: 140px;
+}
+.stage-bar .score-text {
+    color: #fff;
+    flex: 1;
+    text-align: center;
+    font-size: 22px;
+}
+.stage-bar .score-text .current-score {
+    color: #ffd54f;
+    font-weight: bold;
+    font-size: 26px;
+}
+.stage-bar .spin-text {
+    color: #ccc;
+    min-width: 100px;
+    text-align: right;
+}
+
+/* ---- 得分进度条 ---- */
+.score-progress {
+    height: 16px;
+    background: #3e2d1a;
+    border: 1px solid #c9a94e;
+    border-radius: 8px;
+    overflow: hidden;
+    margin: 4px 14px 2px 14px;
+}
+.score-progress-inner {
+    height: 100%;
+    background: linear-gradient(90deg, #c9a94e, #ffe082);
+    transition: width 0.7s ease;
+    border-radius: 8px;
+}
+
+/* ---- 老虎机展示板 ---- */
+.slot-board {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    padding: 30px 10px 20px;
+    flex-wrap: wrap;
+}
+.slot-card {
+    width: 90px;
+    height: 110px;
+    border: 2px solid #c9a94e;
+    border-radius: 10px;
+    background: #3e2d1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 40px;
+    transition: transform 0.3s, box-shadow 0.3s, opacity 0.5s;
+    position: relative;
+}
+.slot-card .slot-name {
+    font-size: 14px;
+    color: #ffe082;
+    margin-top: 4px;
+}
+.slot-card .slot-score-tag {
+    position: absolute;
+    top: 2px;
+    right: 4px;
+    font-size: 13px;
+    color: #ccc;
+}
+.slot-card.highlight {
+    box-shadow: 0 0 12px 4px #ffe082;
+    transform: scale(1.08);
+}
+.slot-card.consumed {
+    opacity: 0.25;
+    transform: scale(0.8);
+    border-color: #666;
+}
+.slot-card.spinning {
+    animation: slotSpin 0.15s infinite alternate;
+}
+@keyframes slotSpin {
+    from { transform: translateY(-4px); }
+    to   { transform: translateY(4px); }
+}
+
+/* ---- 操作按钮 ---- */
+.fortune-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    padding: 10px;
+    flex-wrap: wrap;
+}
+.fortune-actions button {
+    font-size: 22px;
+    padding: 10px 30px;
+    background: linear-gradient(135deg, #c9a94e, #a67c00);
+    color: #1a1208;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+}
+.fortune-actions button:hover {
+    filter: brightness(1.2);
+}
+.fortune-actions button:disabled {
+    background: #555;
+    color: #888;
+    cursor: not-allowed;
+}
+
+/* ---- 奖励选择 ---- */
+.reward-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 30px;
+}
+.reward-panel h2 {
+    color: #ffe082;
+    font-size: 24px;
+    margin: 0;
+}
+.reward-choices {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.reward-card {
+    width: 130px;
+    padding: 16px 10px;
+    border: 2px solid #c9a94e;
+    border-radius: 10px;
+    background: #3e2d1a;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.reward-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 10px #ffe082;
+}
+.reward-card .reward-emoji {
+    font-size: 42px;
+}
+.reward-card .reward-name {
+    font-size: 18px;
+    color: #ffe082;
+    font-weight: bold;
+}
+.reward-card .reward-desc {
+    font-size: 14px;
+    color: #ccc;
+    text-align: center;
+}
+.reward-card.selected {
+    border-color: #4caf50;
+    box-shadow: 0 0 14px #4caf50;
+}
+
+/* ---- 袋子预览 ---- */
+.bag-preview {
+    padding: 6px 12px;
+    border-top: 1px solid #5a4a33;
+    max-height: 180px;
+    overflow-y: auto;
+}
+.bag-preview h3 {
+    color: #ffe082;
+    font-size: 18px;
+    margin: 4px 0;
+}
+.bag-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+}
+.bag-chip {
+    font-size: 22px;
+    background: #3e2d1a;
+    border: 1px solid #8a7040;
+    border-radius: 6px;
+    padding: 3px 7px;
+    cursor: default;
+}
+.bag-chip:hover {
+    background: #5a4a33;
+}
+
+/* ---- 消除/删除袋子的选择 ---- */
+.purge-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 30px;
+}
+.purge-panel h2 {
+    color: #ffe082;
+    font-size: 22px;
+    margin: 0;
+}
+.purge-choices {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+.purge-chip {
+    font-size: 30px;
+    padding: 8px 14px;
+    border: 2px solid #c9a94e;
+    border-radius: 8px;
+    background: #3e2d1a;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.purge-chip:hover {
+    box-shadow: 0 0 8px #ff5252;
+    transform: scale(1.1);
+}
+
+/* ---- 结算浮字 ---- */
+.slot-float {
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 18px;
+    font-weight: bold;
+    color: #4caf50;
+    animation: slotFloatUp 1.2s ease forwards;
+    pointer-events: none;
+    z-index: 5;
+    white-space: nowrap;
+}
+.slot-float.negative {
+    color: #ff5252;
+}
+@keyframes slotFloatUp {
+    0%   { opacity: 1; top: -10px; }
+    100% { opacity: 0; top: -50px; }
+}
+
+/* ---- 解说区 ---- */
+.resolution-log {
+    padding: 6px 12px;
+    font-size: 18px;
+    color: #ddd;
+    line-height: 1.5;
+    border-top: 1px solid #5a4a33;
+    flex: 1;
+    overflow-y: auto;
+    min-height: 0;
+}
+.resolution-log .res-step {
+    padding: 2px 0;
+}
+.resolution-log .res-step.positive { color: #4caf50; }
+.resolution-log .res-step.negative { color: #ff5252; }
+.resolution-log .res-step.special  { color: #ffd54f; }
