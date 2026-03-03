@@ -15,7 +15,7 @@ var DB_FORTUNE = (function () {
 
     /* ---- 物品字典 ---- */
     var ITEMS = {
-        coin:      { id: 'coin',      name: '铜钱',     emoji: '🪙', baseScore: 1,  tier: 'base',   desc: '普通钱币' },
+        coin:      { id: 'coin',      name: '铜钱',     emoji: '💰', baseScore: 1,  tier: 'base',   desc: '普通钱币' },
         grass:     { id: 'grass',     name: '野草',     emoji: '🌿', baseScore: 1,  tier: 'base',   desc: '微薄灵气' },
         wine_cup:  { id: 'wine_cup',  name: '空杯',     emoji: '🍵', baseScore: 2,  tier: 'base',   desc: '空酒盏' },
         mouse:     { id: 'mouse',     name: '老鼠',     emoji: '🐭', baseScore: 0,  tier: 'base',   desc: '不提供分数' },

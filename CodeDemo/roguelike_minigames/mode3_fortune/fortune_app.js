@@ -39,6 +39,12 @@
         $app = $('#app');
         $toast = $('#toast');
         resetState();
+        addLog('📜 玩法说明：', 'special');
+        addLog('1. 点击【运转气运盘】从袋子里随机抽6件物品', '');
+        addLog('2. 物品自动结算得分，有联动加成（猫吃鼠+25、商贾×钱币+4/个…）', '');
+        addLog('3. 每个Stage限定转盘次数，累计分数达标即过关', '');
+        addLog('4. 过关后可选1个新物品加入袋子，构筑你的印钞引擎！', '');
+        addLog('—— 目标：Stage1→100分, Stage2→300, Stage3→800, Stage4→2000, Stage5→5000 ——', 'special');
         render();
     }
 

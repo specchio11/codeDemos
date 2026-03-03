@@ -8,20 +8,20 @@ var DB_DICE = (function () {
     var SKILLS = [
         {
             id: 1, name: '普通攻击', icon: '⚔️',
-            reqDesc: '任意点数',
+            reqDesc: '任意点数，固定3伤',
             check: function () { return true; },
             effect: function (dice, ctx) {
-                ctx.dealDamage(dice.value);
-                ctx.log('普通攻击！造成 ' + dice.value + ' 点伤害');
+                ctx.dealDamage(3);
+                ctx.log('普通攻击！造成 3 点伤害');
             }
         },
         {
             id: 2, name: '灵力护盾', icon: '🛡️',
-            reqDesc: '任意点数',
+            reqDesc: '任意点数，固定3盾',
             check: function () { return true; },
             effect: function (dice, ctx) {
-                ctx.addShield(dice.value);
-                ctx.log('灵力护盾！获得 ' + dice.value + ' 点护盾');
+                ctx.addShield(3);
+                ctx.log('灵力护盾！获得 3 点护盾');
             }
         },
         {
@@ -29,8 +29,8 @@ var DB_DICE = (function () {
             reqDesc: '点数 = 3',
             check: function (dice) { return dice.value === 3; },
             effect: function (dice, ctx) {
-                ctx.dealDamage(8, true);
-                ctx.log('精准刺击！造成 8 点穿甲伤害');
+                ctx.dealDamage(3, true);
+                ctx.log('精准刺击！造成 3 点穿甲伤害（无视护盾）');
             }
         },
         {
@@ -49,8 +49,9 @@ var DB_DICE = (function () {
             check: function (dice) { return dice.value <= 3; },
             effect: function (dice, ctx) {
                 ctx.dealDamage(dice.value);
-                ctx.addBonusDice(1);
-                ctx.log('连击！造成 ' + dice.value + ' 点伤害，返还 1 枚[1]骰子');
+                var newVal = Math.floor(Math.random() * 6) + 1;
+                ctx.addBonusDice(newVal);
+                ctx.log('连击！造成 ' + dice.value + ' 点伤害，返还 1 枚[' + newVal + ']骰子');
             }
         },
         {
@@ -88,9 +89,9 @@ var DB_DICE = (function () {
     var RELICS = [
         { id: 'abacus',   name: '破旧的算盘', icon: '🧮', desc: '战斗胜利金币 +5' },
         { id: 'amulet',   name: '生机护身符', icon: '💚', desc: '进入战斗恢复 5 HP' },
-        { id: 'lucky',    name: '幸运铜钱',   icon: '🪙', desc: '每场战斗允许 1 次重掷' },
+        { id: 'lucky',    name: '幸运铜钱',   icon: '💲', desc: '每场战斗允许 1 次重掷' },
         { id: 'thunder',  name: '雷火珠',     icon: '⚡', desc: '使用[6]骰子时额外 4 点雷伤' },
-        { id: 'turtle',   name: '铁王八',     icon: '🐢', desc: '回合结束未用骰子每个+2护盾' }
+        { id: 'turtle',   name: '铁王八',     icon: '🐢', desc: '回合结束未用骰子每个+3护盾' }
     ];
 
     /* ---- 普通怪物池 ---- */
@@ -116,7 +117,7 @@ var DB_DICE = (function () {
     /* ---- 精英怪物池 ---- */
     var ELITE_ENEMIES = [
         {
-            id: 'blood_spirit', name: '嗜血画灵', emoji: '🩸', hp: 45,
+            id: 'blood_spirit', name: '嗜血画灵', emoji: '👹', hp: 45,
             pattern: [
                 { type: 'attack', value: 8, desc: '吸血斩 — 攻击 8' },
                 { type: 'attack', value: 10, desc: '暴食 — 攻击 10' },
@@ -124,7 +125,7 @@ var DB_DICE = (function () {
             ]
         },
         {
-            id: 'rock_demon', name: '巨岩妖', emoji: '🪨', hp: 55,
+            id: 'rock_demon', name: '巨岩妖', emoji: '⛰️', hp: 55,
             pattern: [
                 { type: 'shield', value: 10, desc: '岩甲 — 加盾 10' },
                 { type: 'attack', value: 7, desc: '落石 — 攻击 7' },
@@ -184,9 +185,77 @@ var DB_DICE = (function () {
         { type: 'BOSS',    label: '⑦ 关底首领',  icon: '👹' }
     ];
 
+    /* ---- 种族初始技能（槽3） ---- */
+    var RACE_SKILLS = {
+        xian: {
+            id: 101, name: '御剑术', icon: '🌟',
+            reqDesc: '点数 ≥ 4',
+            check: function (dice) { return dice.value >= 4; },
+            effect: function (dice, ctx) {
+                var dmg = dice.value + 2;
+                ctx.dealDamage(dmg);
+                ctx.log('御剑术！造成 ' + dmg + ' 点伤害');
+            }
+        },
+        ren: {
+            id: 102, name: '随机应变', icon: '🔄',
+            reqDesc: '点数 ≤ 3',
+            check: function (dice) { return dice.value <= 3; },
+            effect: function (dice, ctx) {
+                ctx.dealDamage(3);
+                var newVal = Math.floor(Math.random() * 6) + 1;
+                ctx.addBonusDice(newVal);
+                ctx.log('随机应变！造成 3 点伤害，返还 1 枚[' + newVal + ']骰子');
+            }
+        },
+        yao: {
+            id: 103, name: '野性撕咬', icon: '🐾',
+            reqDesc: '任意，骰值穿甲',
+            check: function () { return true; },
+            effect: function (dice, ctx) {
+                ctx.dealDamage(dice.value, true);
+                ctx.log('野性撕咬！造成 ' + dice.value + ' 点穿甲伤害');
+            }
+        },
+        mo: {
+            id: 104, name: '噬魂术', icon: '💀',
+            reqDesc: '奇数(1,3,5)',
+            check: function (dice) { return dice.value % 2 === 1; },
+            effect: function (dice, ctx) {
+                ctx.dealDamage(2);
+                ctx.applyEnemyDebuff('poison', 1);
+                ctx.applyEnemyDebuff('weak', 1);
+                ctx.log('噬魂术！造成 2 点伤害 + 1 层中毒 + 1 层虚弱');
+            }
+        }
+    };
+
+    /* ---- 前缀被动加成 ---- */
+    var PASSIVES = {
+        player:   { id: 'player',   name: '灵感顿悟', icon: '💡', desc: '休息站可额外学习新技能' },
+        fengshan: { id: 'fengshan', name: '聚宝生辉', icon: '💰', desc: '战斗胜利额外 +3 金币' },
+        chuanfei: { id: 'chuanfei', name: '灵息加速', icon: '💨', desc: '每场战斗第1回合获得4枚骰子' },
+        dingfen:  { id: 'dingfen',  name: '命数已定', icon: '🔮', desc: '每场战斗可免费重掷1次' },
+        wanshu:   { id: 'wanshu',   name: '百宝囊中', icon: '🎒', desc: '奇遇事件额外获得安全选项' },
+        guidao:   { id: 'guidao',   name: '阴毒入骨', icon: '☠️', desc: '施加debuff时额外+1层' }
+    };
+
+    /* ---- 预设NPC名单（模拟局外已有角色） ---- */
+    var NPCS = [
+        { id: 'npc_murong', name: '慕容逸风', emoji: '🧙', race: 'xian', skillPrefix: 'fengshan' },
+        { id: 'npc_wang',   name: '王云起',   emoji: '👨', race: 'ren',  skillPrefix: 'chuanfei' },
+        { id: 'npc_hu',     name: '狐九娘',   emoji: '🦊', race: 'yao',  skillPrefix: 'guidao' },
+        { id: 'npc_ming',   name: '冥魂子',   emoji: '😈', race: 'mo',   skillPrefix: 'dingfen' },
+        { id: 'npc_luo',    name: '洛青衣',   emoji: '👩', race: 'xian', skillPrefix: 'dingfen' },
+        { id: 'npc_tie',    name: '铁牛',     emoji: '💪', race: 'ren',  skillPrefix: 'fengshan' }
+    ];
+
     return {
         SKILLS: SKILLS,
         RELICS: RELICS,
+        RACE_SKILLS: RACE_SKILLS,
+        PASSIVES: PASSIVES,
+        NPCS: NPCS,
         NORMAL_ENEMIES: NORMAL_ENEMIES,
         ELITE_ENEMIES: ELITE_ENEMIES,
         BOSS: BOSS,
